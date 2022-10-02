@@ -312,10 +312,9 @@ char* fsNameForErrorReport;
 
 int flicFrameDelay;
 
-// [PERF] only 412 bytes are needed, but the array is of type dword and thus
-// uses 412*4 = 1648 bytes.  Most likely done by accident, maybe the type was
-// initially byte and was then changed to dword without adjusting the size.
-dword sndPackageHeader[412];
+// [PATCH] 412 bytes are needed, but the array is of type dword and thus
+// only 103 elements are allocated.
+dword sndPackageHeader[103];
 
 byte sndAudioData[6069];
 
