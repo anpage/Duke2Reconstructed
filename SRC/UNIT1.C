@@ -447,7 +447,6 @@ void pascal DrawFullscreenImage(char far* filename)
   word bytesRead;
   word mask = 0x100;
   byte far* vram = MK_FP(0xa000, 0);
-  byte far* data = MM_PushChunk(2000, CT_TEMPORARY);
 
   OpenAssetFile(filename, &fd);
 
@@ -455,43 +454,13 @@ void pascal DrawFullscreenImage(char far* filename)
   EGA_SET_DEFAULT_BITMASK();
 
   SetDrawPage(0);
-
+  
+  // [PATCH] Load the entire image directly into VRAM instead of using a
+  // 2000-byte buffer
   for (j = 0; (unsigned)j < 32000; j += 8000)
   {
-    // Loading the image in 2000-byte chunks makes this a bit more complicated
-    // than one might expect, but this was likely done to reduce the amount of
-    // memory needed. This function is also used for menus while in-game, so the
-    // game itself is already using a lot of the available memory.  Allocating
-    // the entire 8000 bytes at once might be too much and cause a crash.
-    //
-    // [NOTE] It seems this complexity could've been avoided entirely by
-    // reading straight into video memory, which would require 0 additional
-    // buffer space. Not sure why that's not done here.
-    _dos_read(fd, data, 2000, &bytesRead);
     DN2_outport(0x3c4, 2 | mask);
-    for (i = 0; (unsigned)i < 2000; i++)
-    {
-      vram[i] = data[i];
-    }
-
-    _dos_read(fd, data, 2000, &bytesRead);
-    for (i = 0; (unsigned)i < 2000; i++)
-    {
-      vram[i + 2000] = data[i];
-    }
-
-    _dos_read(fd, data, 2000, &bytesRead);
-    DN2_outport(0x3c4, 2 | mask); // [NOTE] Redundant
-    for (i = 0; (unsigned)i < 2000; i++)
-    {
-      vram[i + 4000] = data[i];
-    }
-
-    _dos_read(fd, data, 2000, &bytesRead);
-    for (i = 0; (unsigned)i < 2000; i++)
-    {
-      vram[i + 6000] = data[i];
-    }
+    _dos_read(fd, vram, 8000, &bytesRead);
 
     mask <<= 1;
   }
@@ -500,8 +469,6 @@ void pascal DrawFullscreenImage(char far* filename)
   CloseFile(fd);
 
   SetDisplayPage(0);
-
-  MM_PopChunk(CT_TEMPORARY);
 }
 
 
