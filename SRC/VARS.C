@@ -302,8 +302,6 @@ byte far* gfxLoadedSprites[MM_MAX_NUM_CHUNKS];
 
 byte levelHeaderData[3002];
 
-word tempTileBuffer[3000];
-
 bool kbKeyState[128];
 
 byte fsGroupFileDict[4000];

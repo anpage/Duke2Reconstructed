@@ -94,7 +94,6 @@ extern word plInventory[NUM_INVENTORY_SLOTS + 1];
 extern bool hackStopApogeeLogo;
 extern byte far* gfxLoadedSprites[MM_MAX_NUM_CHUNKS];
 extern byte levelHeaderData[3002];
-extern word tempTileBuffer[3000];
 extern bool kbKeyState[128];
 extern byte fsGroupFileDict[4000];
 extern int flicFrameDelay;

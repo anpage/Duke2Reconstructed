@@ -321,8 +321,6 @@ void pascal ToggleCheckbox(byte index, byte* checkboxData)
  *
  * The tiles in the original location are erased, tiles in the new location
  * are overwritten.
- * The total number of tiles contained in the specified section mustn't
- * exceed 3000.
  */
 void pascal Map_MoveSection(
   word left,
@@ -333,45 +331,17 @@ void pascal Map_MoveSection(
 {
   int x;
   int y;
-  word colOffset;
-  word rowOffset;
 
-  // Copy tiles from source area into temporary buffer, and erase source area
-  rowOffset = 0;
-  for (y = top; y <= bottom; y++)
+  // [PATCH] Copy tiles directly from the source to the destination, from the
+  // bottom up
+  for (y = bottom; y >= top; y--)
   {
-    colOffset = 0;
     for (x = left; x <= right; x++)
     {
-      *(tempTileBuffer + rowOffset + colOffset) = Map_GetTile(x, y);
+      Map_SetTile(Map_GetTile(x, y), x, y + distance);
       Map_SetTile(0, x, y);
-
-      colOffset++;
     }
-
-    rowOffset += right - left + 1;
   }
-
-  // Now use content of temp buffer to set tiles in destination area
-  rowOffset = 0;
-  top += distance;
-  bottom += distance;
-
-  for (y = top; y <= bottom; y++)
-  {
-    colOffset = 0;
-    for (x = left; x <= right; x++)
-    {
-      Map_SetTile(*(tempTileBuffer + rowOffset + colOffset), x, y);
-
-      colOffset++;
-    }
-
-    rowOffset += right - left + 1;
-  }
-
-  // [PERF] It would be fairly easy to redesign this function so that it
-  // doesn't need a temporary buffer. That would save 3000 bytes of memory.
 }
 
 
