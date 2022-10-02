@@ -566,26 +566,8 @@ static dword SubmitSampleChunk(
   //           | available to a hardware device
   // xxxxxx01  | Apply these settings for channel 1
   //
-  // [BUG] This should actually be `0x48 | sbDmaChannel` instead of 0x49, which
-  // hardcodes channel 1 regardless of the value of sbDmaChannel. Using a
-  // different DMA channel still works fine in DosBox, but on a real system,
-  // the result is pretty rough: The computer locks up completely as soon as
-  // the game tries to play a digitized sound effect. This bug already exists
-  // in the Wolfenstein 3D version of this code, and I'm surprised that it was
-  // never fixed. DMA channel 1 is the default for SoundBlaster cards, and was
-  // probably the most common choice, but I find it hard to imagine that no one
-  // ever ran into this issue.
-  // Now, the game can still work fine if the DMA controller happens to be
-  // configured acceptably for the channel that's actually in use by the sound
-  // card. In fact, running any other software which uses the SoundBlaster and
-  // handles DMA channels correctly before running Duke Nukem II can make the
-  // game itself also run fine.
-  // And it's also possible that some types of BIOS might configure the DMA
-  // controller differently at boot than on my system that I've tested this
-  // with.  So perhaps there were people who did use a different DMA channel
-  // but were still able to run the game by pure chance.
-  // Still, this seems like a rather nasty oversight.
-  outportb(0x0b, 0x49);
+  // [PATCH] This used to hard-code 0x49. Now it uses the correct DMA channel.
+  outportb(0x0b, 0x48 | sbDmaChannel);
 
   // Now give the memory address and length to the DMA controller
   outportb(sbDmaAddressPort, (byte)dataOffset);         // LSB of address
