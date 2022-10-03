@@ -91,8 +91,10 @@ bool MM_Init(void)
 
   // Allocate memory from OS (via Borland standard library) and initialize
   // everything else.
-  mmMemTotal = MM_TOTAL_SIZE;
-  mmRawMem = farmalloc(MM_TOTAL_SIZE);
+  //
+  // [PATCH] Use all available memory, regardless of MM_TOTAL_SIZE
+  mmMemTotal = farcoreleft();
+  mmRawMem = farmalloc(mmMemTotal);
   mmChunksUsed = 0;
   mmMemUsed = 0;
 
