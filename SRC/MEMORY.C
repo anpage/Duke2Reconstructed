@@ -91,8 +91,10 @@ bool MM_Init(void)
 
   // Allocate memory from OS (via Borland standard library) and initialize
   // everything else.
-  mmMemTotal = MM_TOTAL_SIZE;
-  mmRawMem = farmalloc(MM_TOTAL_SIZE);
+  //
+  // [PATCH] Set mmMemTotal in main() instead of here to allow for command line
+  // argument
+  mmRawMem = farmalloc(mmMemTotal);
   mmChunksUsed = 0;
   mmMemUsed = 0;
 

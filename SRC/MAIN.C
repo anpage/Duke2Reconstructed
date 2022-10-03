@@ -2174,11 +2174,22 @@ static void InitCopyProtection(void)
 #endif
 
 
-int main(int argc, char** argv)
+int main(int argc, char *argv[])
 {
   // First, determine how much memory we can allocate from DOS, in order to
   // check if we have enough memory to run the game
   dword availableMem = farcoreleft();
+
+  // [PATCH] Look for a command line argument to determine how many bytes of
+  // memory to allocate for the game, defaulting to the original number.
+  mmMemTotal = MM_TOTAL_SIZE;
+
+  if (argc > 1) {
+    long memTotal = atol(argv[1]);
+    if (memTotal > mmMemTotal) {
+      mmMemTotal = memTotal;
+    }
+  }
 
   // We have to load the group file dict here, because the error screen
   // for insufficient memory is stored in the group file (NUKEM2.CMP).
@@ -2189,7 +2200,7 @@ int main(int argc, char** argv)
   // enough conventional memory is important.
   // Thanks to the custom memory manager, the exact memory requirements are
   // known.
-  if (availableMem < MM_TOTAL_SIZE)
+  if (availableMem < mmMemTotal)
   {
     // "I'm here to kick ass and chew memory, and I'm all out of memory!"
     ShowTextScreen("NOMEMORY.BIN");
